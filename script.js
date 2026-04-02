@@ -131,7 +131,7 @@ class Raven{
         this.spriteWidth = 271;
         this.spriteHeight = 194;
         if (isMobile) {
-             this.sizeModifier = Math.random() * 0.3 + 0.2; // plus petits sur mobile
+             this.sizeModifier = Math.random() * 0.1 + 0.2; // plus petits sur mobile
         } else {
             this.sizeModifier = Math.random() * 0.6 + 0.4; // taille normale PC
         };
@@ -140,7 +140,7 @@ class Raven{
         this.x = canvas.width;
         this.y = Math.random() * (canvas.height- this.height);
         if (isMobile) {
-             this.directionX = this.directionX = canvas.width / 300 + Math.max(0, score - 4) * 5 ;
+             this.directionX = this.directionX = canvas.width / 300 + Math.max(0, score - 4) * 0.9 ;
         } else {
             this.directionX = this.directionX = canvas.width / 300 + Math.max(0, score - 4) * 0.3 ;
         };
