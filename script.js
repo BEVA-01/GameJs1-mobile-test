@@ -22,14 +22,19 @@ let ravenInterval = 1500;
 let lastTime = 0;
 const gameSpeed = 6;
 function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const visibleWidth = window.innerWidth;
+    const visibleHeight = window.visualViewport
+        ? window.visualViewport.height
+        : window.innerHeight;
 
-    collisionCanvas.width = window.innerWidth;
-    collisionCanvas.height = window.innerHeight;
+    canvas.width = visibleWidth;
+    canvas.height = visibleHeight;
 
-    backgroundCanvas.width = window.innerWidth;
-    backgroundCanvas.height = window.innerHeight;
+    collisionCanvas.width = visibleWidth;
+    collisionCanvas.height = visibleHeight;
+
+    backgroundCanvas.width = visibleWidth;
+    backgroundCanvas.height = visibleHeight;
 
     ctx.font = `${Math.max(28, canvas.width * 0.04)}px Impact`;
 
@@ -39,7 +44,10 @@ function resizeCanvas() {
 }
 
 window.addEventListener("resize", resizeCanvas);
-resizeCanvas();
+
+if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", resizeCanvas);
+}
 
 alert("Etes vous prêt(e)? Si oui, cliquez sur le bouton de confirmation.")
 
