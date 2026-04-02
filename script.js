@@ -34,40 +34,71 @@ alert("Etes vous prêt(e)? Si oui, cliquez sur le bouton de confirmation.")
 
 
 
-
+const isMobile = window.innerWidth < 768;
 
 
 backgroundCtx.imageSmoothingEnabled = false;
-class Layer{
-    constructor(image){
-        this.x = 0;
+class Layer {
+    constructor(image) {
         this.image = image;
-        const ratio = image.width / image.height;
-        this.height = backgroundCanvas.height;
-        this.width = this.height * ratio;
-        this.x2 = this.width;
+        this.x = 0;
         this.y = 0;
         this.speed = gameSpeed * 0.6;
+
+        this.resize();
     }
 
-    update(){
+    resize() {
+        const imageRatio = this.image.width / this.image.height;
+        const canvasRatio = backgroundCanvas.width / backgroundCanvas.height;
+
+        if (canvasRatio > imageRatio) {
+            // écran plus large que l'image → on ajuste à la largeur
+            this.width = backgroundCanvas.width;
+            this.height = this.width / imageRatio;
+        } else {
+            // écran plus haut/étroit → on ajuste à la hauteur
+            this.height = backgroundCanvas.height;
+            this.width = this.height * imageRatio;
+        }
+
+        this.x = 0;
+        this.x2 = this.width;
+
+        // centre vertical si l'image dépasse en hauteur
+        this.y = (backgroundCanvas.height - this.height) / 2;
+    }
+
+    update() {
         this.x -= this.speed;
         this.x2 -= this.speed;
 
-        if(this.x <= -this.width){
+        if (this.x <= -this.width) {
             this.x = this.x2 + this.width;
         }
 
-        if(this.x2 <= -this.width){
+        if (this.x2 <= -this.width) {
             this.x2 = this.x + this.width;
         }
     }
 
-draw(){
-    backgroundCtx.drawImage(this.image, Math.floor(this.x), this.y, this.width + 2, this.height);
-    backgroundCtx.drawImage(this.image, Math.floor(this.x2) - 2, this.y, this.width + 2, this.height);
-}
+    draw() {
+        backgroundCtx.drawImage(
+            this.image,
+            Math.floor(this.x),
+            this.y,
+            this.width + 2,
+            this.height
+        );
 
+        backgroundCtx.drawImage(
+            this.image,
+            Math.floor(this.x2) - 2,
+            this.y,
+            this.width + 2,
+            this.height
+        );
+    }
 }
 
 
@@ -99,12 +130,16 @@ class Raven{
     constructor(){
         this.spriteWidth = 271;
         this.spriteHeight = 194;
-        this.sizeModifier = Math.random() * 0.6 + 0.4;
+        if (isMobile) {
+             this.sizeModifier = Math.random() * 0.3 + 0.2; // plus petits sur mobile
+        } else {
+            this.sizeModifier = Math.random() * 0.6 + 0.4; // taille normale PC
+        };
         this.width = this.spriteWidth * this.sizeModifier;
         this.height = this.spriteHeight * this.sizeModifier;
         this.x = canvas.width;
         this.y = Math.random() * (canvas.height- this.height);
-        this.directionX = canvas.width/300 ;
+        this.directionX = this.directionX = canvas.width / 300 + Math.max(0, score - 4) * 0.3 ;
         this.directionY = Math.random() * 5 - 2.5;
         this.markedForDeletion = false
         this.image= new Image();
