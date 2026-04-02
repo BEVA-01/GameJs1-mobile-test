@@ -24,7 +24,18 @@ const gameSpeed = 6;
 function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+
+    collisionCanvas.width = window.innerWidth;
+    collisionCanvas.height = window.innerHeight;
+
+    backgroundCanvas.width = window.innerWidth;
+    backgroundCanvas.height = window.innerHeight;
+
     ctx.font = `${Math.max(28, canvas.width * 0.04)}px Impact`;
+
+    if (background) {
+        background.resize();
+    }
 }
 
 window.addEventListener("resize", resizeCanvas);
@@ -126,42 +137,51 @@ const musicPlaying = new Music("music.wav")
 
 
 let ravens = [];
-class Raven{
-    constructor(){
+class Raven {
+    constructor() {
         this.spriteWidth = 271;
         this.spriteHeight = 194;
+
         if (isMobile) {
-             this.sizeModifier = Math.random() * 0.1 + 0.2; // plus petits sur mobile
+            this.sizeModifier = Math.random() * 0.1 + 0.2;
         } else {
-            this.sizeModifier = Math.random() * 0.6 + 0.4; // taille normale PC
-        };
+            this.sizeModifier = Math.random() * 0.6 + 0.4;
+        }
+
         this.width = this.spriteWidth * this.sizeModifier;
         this.height = this.spriteHeight * this.sizeModifier;
         this.x = canvas.width;
-        this.y = Math.random() * (canvas.height- this.height);
+        this.y = Math.random() * (canvas.height - this.height);
+
         if (isMobile) {
-             this.directionX = this.directionX = canvas.width / 300 + Math.max(0, score - 4) * 0.2 ;
+            this.directionX = 180 + Math.max(0, score - 4) * 12;
         } else {
-            this.directionX = this.directionX = canvas.width / 300 + Math.max(0, score - 4) * 0.3 ;
-        };
-        this.directionY = Math.random() * 5 - 2.5;
-        this.markedForDeletion = false
-        this.image= new Image();
-        this.image.src = "raven.png"
-        // this.frame = 0 NOTE:Tout ceci est l'ancienne version codé en dur pour le changement de frame de l'image, cette partie est remplacée par toute la section deltaTime
-        // this.imageframe = 9 NOTE:Tout ceci est l'ancienne version codé en dur pour le changement de frame de l'image, cette partie est remplacée par toute la section deltaTime
-        // this.nextImage = 0 NOTE:Tout ceci est l'ancienne version codé en dur pour le changement de frame de l'image, cette partie est remplacée par toute la section deltaTime
+            this.directionX = 260 + Math.max(0, score - 4) * 18;
+        }
+
+        this.directionY = (Math.random() * 120) - 60;
+
+        this.markedForDeletion = false;
+        this.image = new Image();
+        this.image.src = "raven.png";
+
         this.frame = 0;
-        this.maxFrame = 4
-        this.timeSinceFlap = 0;//this.timeSinceFlap et this.flapInterval vont être utilisé avec deltaTime pour créer les fps et s'adapter à chaque ordinateur, si ordi rapide valeur par frame de delta rapide, si ordi lent valeur de deltaTime lente donc avec ça les deux machines lirons le code à la même vitesse 
+        this.maxFrame = 4;
+        this.timeSinceFlap = 0;
         this.flapInterval = 70;
-        this.randomColors= [Math.floor(Math.random() * 255), Math.floor(Math.random() * 255), Math.floor(Math.random() * 255)];
-        this.color = `rgb(${this.randomColors[0]},${this.randomColors[1]},${this.randomColors[2]})`
+
+        this.randomColors = [
+            Math.floor(Math.random() * 255),
+            Math.floor(Math.random() * 255),
+            Math.floor(Math.random() * 255)
+        ];
+        this.color = `rgb(${this.randomColors[0]},${this.randomColors[1]},${this.randomColors[2]})`;
     }
-    update(deltaTime){
-        // this.frame++ NOTE:Tout ceci est l'ancienne version codé en dur pour le changement de frame de l'image, cette partie est remplacée par toute la section deltaTime
-        // if(this.frame % this.imageframe === 0) this.nextImage++; NOTE:Tout ceci est l'ancienne version codé en dur pour le changement de frame de l'image, cette partie est remplacée par toute la section deltaTime
-        // if(this.nextImage > 5) this.nextImage=0; NOTE:Tout ceci est l'ancienne version codé en dur pour le changement de frame de l'image, cette partie est remplacée par toute la section deltaTime
+
+    update(deltaTime) {
+        this.x -= this.directionX * (deltaTime / 1000);
+        this.y += this.directionY * (deltaTime / 1000);
+
         if (this.y < 0) {
             this.y = 0;
             this.directionY *= -1;
@@ -169,28 +189,36 @@ class Raven{
             this.y = canvas.height - this.height;
             this.directionY *= -1;
         }
-        this.x -= this.directionX;
-        this.y += this.directionY;
+
         if (this.x < 0 - this.width) {
             this.markedForDeletion = true;
             live--;
             console.log(live);
         }
-        this.timeSinceFlap += deltaTime;
-        if(this.timeSinceFlap > this.flapInterval){
-            if (this.frame > this.maxFrame) this.frame=0;
-            else this.frame++;
-            this.timeSinceFlap = 0
-        }
 
-        // console.log(deltaTime)
+        this.timeSinceFlap += deltaTime;
+        if (this.timeSinceFlap > this.flapInterval) {
+            if (this.frame > this.maxFrame) this.frame = 0;
+            else this.frame++;
+            this.timeSinceFlap = 0;
+        }
     }
-    draw(){
-        collisionCtx.fillStyle = this.color;//va colorer les valeurs de fillRect()
-        collisionCtx.fillRect(this.x, this.y, this.width, this.height)
-        // ctx.strokeRect(this.x, this.y, this.width, this.height)
-        ctx.drawImage(this.image, this.frame * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height)
-        //ctx.drawImage(this.image, this.frame * this.spriteWidth,0, this.spriteWidth, this.spriteHeight,this.x, this.y, this.width, this.height);
+
+    draw() {
+        collisionCtx.fillStyle = this.color;
+        collisionCtx.fillRect(this.x, this.y, this.width, this.height);
+
+        ctx.drawImage(
+            this.image,
+            this.frame * this.spriteWidth,
+            0,
+            this.spriteWidth,
+            this.spriteHeight,
+            this.x,
+            this.y,
+            this.width,
+            this.height
+        );
     }
 }
 
