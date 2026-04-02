@@ -34,7 +34,7 @@ alert("Etes vous prêt(e)? Si oui, cliquez sur le bouton de confirmation.")
 
 
 
-const isMobile = window.innerWidth < 768;
+const isMobile = window.innerWidth < 850;
 
 
 backgroundCtx.imageSmoothingEnabled = false;
