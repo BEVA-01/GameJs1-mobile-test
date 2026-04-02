@@ -140,7 +140,7 @@ class Raven{
         this.x = canvas.width;
         this.y = Math.random() * (canvas.height- this.height);
         if (isMobile) {
-             this.directionX = this.directionX = canvas.width / 300 + Math.max(0, score - 4) * 0.9 ;
+             this.directionX = this.directionX = canvas.width / 300 + Math.max(0, score - 4) * 0.2 ;
         } else {
             this.directionX = this.directionX = canvas.width / 300 + Math.max(0, score - 4) * 0.3 ;
         };
@@ -162,8 +162,12 @@ class Raven{
         // this.frame++ NOTE:Tout ceci est l'ancienne version codé en dur pour le changement de frame de l'image, cette partie est remplacée par toute la section deltaTime
         // if(this.frame % this.imageframe === 0) this.nextImage++; NOTE:Tout ceci est l'ancienne version codé en dur pour le changement de frame de l'image, cette partie est remplacée par toute la section deltaTime
         // if(this.nextImage > 5) this.nextImage=0; NOTE:Tout ceci est l'ancienne version codé en dur pour le changement de frame de l'image, cette partie est remplacée par toute la section deltaTime
-        if(this.y<0 || this.y > canvas.height - this.height){ //si le corbeau sort de l'écran de manière verticale alors, le code ci dessous se lance
-            this.directionY = this.directionY * -1 // si c'est déjà un chiffre négatif alors moins x moins = + donc ça remonte et si c'est un nombre positif plus x moins = - donc ça descend ce qui permet de constamment inverser les valeur et -1 permet de les modifier sans toucher aux chiffres d'origines juste on change postif et négatif
+        if (this.y < 0) {
+            this.y = 0;
+            this.directionY *= -1;
+        } else if (this.y > canvas.height - this.height) {
+            this.y = canvas.height - this.height;
+            this.directionY *= -1;
         }
         this.x -= this.directionX;
         this.y += this.directionY;
