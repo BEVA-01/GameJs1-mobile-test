@@ -139,7 +139,11 @@ class Raven{
         this.height = this.spriteHeight * this.sizeModifier;
         this.x = canvas.width;
         this.y = Math.random() * (canvas.height- this.height);
-        this.directionX = this.directionX = canvas.width / 300 + Math.max(0, score - 4) * 0.3 ;
+        if (isMobile) {
+             this.directionX = this.directionX = canvas.width / 300 + Math.max(0, score - 4) * 5 ;
+        } else {
+            this.directionX = this.directionX = canvas.width / 300 + Math.max(0, score - 4) * 0.3 ;
+        };
         this.directionY = Math.random() * 5 - 2.5;
         this.markedForDeletion = false
         this.image= new Image();
